@@ -1,0 +1,51 @@
+
+library(dplyr)
+
+
+library(tidyr)
+
+install.packages("wrs2")
+
+library(WRS2)
+setwd("C:/Users/cassandra/Desktop/Titanic")
+#Load Data
+titanic.new <- read.csv("titanic_original.csv", header = TRUE, sep = ",")
+
+#Replace missing value in Embarked column 
+
+titanic.new[c(169, 285), "embarked"] <- "S"
+
+#Calculate the mean of the Age and fill in missing vales with mean 
+
+titanic.new$age[is.na(titanic.new$age)] <- mean(titanic.new$age, na.rm=TRUE)
+
+#Think about other ways you could have populated the missing values in the age column. 
+#Why would you pick any of those over the mean (or not)?
+# I would pick age because there is no association between age any other variable in the titanic dataset
+
+#LifeBoat
+# Fill in missing values
+lifeboat <- titanic.new$boat
+lifeboat[lifeboat == ""] <- NA
+titanic.new$boat <- lifeboat
+
+#Cabin
+#Replace missing values with NA
+cabinNumber<- titanic.new$cabin
+cabinNumber[cabinNumber == ""] <- NA
+titanic.new$cabin <- cabinNumber
+
+#Create new column has_cabin_number
+
+titanic.new$has_cabin_number <- 0
+
+#Replace 0 with 1 if cabin number is known for each passenger
+for (i in 1:length(titanic.new$cabin)){
+  if (is.na(titanic.new$cabin[i]) == FALSE){
+    titanic.new$has_cabin_number[i] <- 1
+  }
+}
+
+#Output to csv file
+
+write.csv(titanic.new, file = "titanic_clean.csv")
